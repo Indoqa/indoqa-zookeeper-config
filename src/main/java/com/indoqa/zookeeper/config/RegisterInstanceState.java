@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.indoqa.zookeeper.config;
 
 import java.net.InetAddress;
@@ -42,7 +41,11 @@ public class RegisterInstanceState extends AbstractZooKeeperState {
         this.logger.info("Registering instance '{}' @ session '{}' ...", hostName, sessionName);
 
         String instancesPath = combinePath(this.serviceId, "instances");
-        this.ensureNodeExists(instancesPath);
+        if (!this.exists(instancesPath)) {
+            throw new ZooKeeperRegistrationException(
+                "The path '" + instancesPath + "' does not exist. Check if ZooKeeper contains the service description '"
+                    + this.serviceId + "'.");
+        }
 
         String instancePath = combinePath(instancesPath, hostName);
         this.ensureNodeExists(instancePath);
@@ -62,6 +65,15 @@ public class RegisterInstanceState extends AbstractZooKeeperState {
         } catch (Exception e) {
             this.logger.error("Could not determine host name.", e);
             return "UNKNOWN-" + UUID.randomUUID().toString();
+        }
+    }
+
+    public static class ZooKeeperRegistrationException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        public ZooKeeperRegistrationException(String message) {
+            super(message);
         }
     }
 }
