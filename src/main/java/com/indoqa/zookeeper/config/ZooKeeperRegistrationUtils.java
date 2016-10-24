@@ -27,9 +27,10 @@ import com.indoqa.zookeeper.StateExecutor;
 
 public final class ZooKeeperRegistrationUtils {
 
-    private static final String SYS_PROP_ZK_CONNECT_STRING = "zookeeper.connect-string";
-    private static final String SYS_PROP_ZK_TIME_OUT = "zookeeper.time-out";
-    private static final String DEFAULT_ZK_TIME_OUT = "5000";
+    private static final String PROP_ZK_CONNECT_STRING = "zookeeper.connect-string";
+    private static final String PROP_ZK_SESSION_TIMEOUT = "zookeeper.session-timeout";
+    private static final String DEFAULT_ZK_SESSION_TIMEOUT = "5000";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ZooKeeperRegistrationUtils.class);
 
     private ZooKeeperRegistrationUtils() {
@@ -42,15 +43,16 @@ public final class ZooKeeperRegistrationUtils {
     public static void registerZooKeeperServices(ConfigurableApplicationContext applicationContext, String... servicesNames) {
         checkServiceNames(servicesNames);
 
-        String zooKeeperConnect = System.getProperty(SYS_PROP_ZK_CONNECT_STRING);
-        if (isEmpty(zooKeeperConnect)) {
-            LOGGER.warn("The system property {} is not set or empty. The application will NOT register with ZooKeeper.",
-                SYS_PROP_ZK_CONNECT_STRING);
+        String connectString = applicationContext.getEnvironment().getProperty(PROP_ZK_CONNECT_STRING);
+        if (isEmpty(connectString)) {
+            LOGGER.warn("The property '{}' is not set or empty. The application will NOT register with ZooKeeper.",
+                PROP_ZK_CONNECT_STRING);
             return;
         }
-        int zooKeeperTimeout = getConnectionTimeOut();
 
-        StateExecutor stateExecutor = new StateExecutor(zooKeeperConnect, zooKeeperTimeout);
+        int sessionTimeout = getSessionTimeout(applicationContext);
+
+        StateExecutor stateExecutor = new StateExecutor(connectString, sessionTimeout);
         registerStateExecutor(applicationContext, stateExecutor);
 
         MutablePropertySources propertySources = applicationContext.getEnvironment().getPropertySources();
@@ -69,20 +71,19 @@ public final class ZooKeeperRegistrationUtils {
             throw new ZooKeeperRegistrationException(
                 "There was no service name passed that should be used to register the application.");
         }
-
     }
 
-    private static int getConnectionTimeOut() {
+    private static int getSessionTimeout(ConfigurableApplicationContext applicationContext) {
         try {
-            String timeOut = System.getProperty("zookeeper.time-out");
+            String value = applicationContext.getEnvironment().getProperty(PROP_ZK_SESSION_TIMEOUT);
 
-            if (isEmpty(timeOut)) {
-                timeOut = DEFAULT_ZK_TIME_OUT;
+            if (isEmpty(value)) {
+                value = DEFAULT_ZK_SESSION_TIMEOUT;
             }
 
-            return Integer.parseInt(timeOut);
+            return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            throw new ZooKeeperRegistrationException("Error while parsing the system property " + SYS_PROP_ZK_TIME_OUT, e);
+            throw new ZooKeeperRegistrationException("Error while parsing the value of property " + PROP_ZK_SESSION_TIMEOUT, e);
         }
     }
 
@@ -92,18 +93,5 @@ public final class ZooKeeperRegistrationUtils {
 
     private static void registerStateExecutor(ConfigurableApplicationContext applicationContext, StateExecutor stateExecutor) {
         applicationContext.getBeanFactory().registerSingleton(stateExecutor.getClass().getName(), stateExecutor);
-    }
-
-    public static class ZooKeeperRegistrationException extends RuntimeException {
-
-        private static final long serialVersionUID = 1L;
-
-        public ZooKeeperRegistrationException(String message) {
-            super(message);
-        }
-
-        public ZooKeeperRegistrationException(String message, Throwable t) {
-            super(message, t);
-        }
     }
 }
