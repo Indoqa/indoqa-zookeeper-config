@@ -29,7 +29,9 @@ import com.indoqa.zookeeper.AbstractZooKeeperState;
 
 public class ReadConfigurationState extends AbstractZooKeeperState {
 
-    private static final String PLACEHOLDER = "${zk:";
+    private static final String PLACEHOLDER_START = "${zk:";
+    private static final String PLACEHOLDER_END = "}";
+
     private final String basePath;
 
     private final Map<String, String> encounteredPlaceholders = new HashMap<>();
@@ -64,13 +66,13 @@ public class ReadConfigurationState extends AbstractZooKeeperState {
     }
 
     private String fillPlaceholders(String propertyValue) throws KeeperException {
-        int startIndex = propertyValue.indexOf(PLACEHOLDER);
+        int startIndex = propertyValue.indexOf(PLACEHOLDER_START);
         if (startIndex == -1) {
             return propertyValue;
         }
 
-        int endIndex = propertyValue.indexOf("}", startIndex);
-        String path = propertyValue.substring(startIndex + PLACEHOLDER.length(), endIndex);
+        int endIndex = propertyValue.indexOf(PLACEHOLDER_END, startIndex);
+        String path = propertyValue.substring(startIndex + PLACEHOLDER_START.length(), endIndex);
 
         String value = this.encounteredPlaceholders.get(path);
         if (value == null) {
@@ -79,7 +81,7 @@ public class ReadConfigurationState extends AbstractZooKeeperState {
         }
 
         StringBuilder stringBuilder = new StringBuilder(propertyValue);
-        stringBuilder.replace(startIndex, endIndex + 1, value);
+        stringBuilder.replace(startIndex, endIndex + PLACEHOLDER_END.length(), value);
         return this.fillPlaceholders(stringBuilder.toString());
     }
 
@@ -90,7 +92,7 @@ public class ReadConfigurationState extends AbstractZooKeeperState {
         if (hasData(data)) {
             return asString(data);
         } else if (stat.getNumChildren() == 0) {
-            // if this node is a leaf, but has no data, we'll interpret this an empty value
+            // if this node is a leaf, but has no data, we'll interpret this as an empty value
             return "";
         }
 
