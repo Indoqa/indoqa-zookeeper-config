@@ -46,7 +46,7 @@ public class ReadConfigurationState extends AbstractZooKeeperState {
         try {
             return new String(data, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("Charset 'UTF-8' is not available!");
+            throw new IllegalStateException("Charset 'UTF-8' is not available!", e);
         }
     }
 
