@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.apache.zookeeper.data.Stat;
 
 import com.indoqa.zookeeper.AbstractZooKeeperState;
@@ -46,7 +47,7 @@ public class ReadConfigurationState extends AbstractZooKeeperState {
         try {
             return new String(data, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("Charset 'UTF-8' is not available!");
+            throw new IllegalStateException("Charset 'UTF-8' is not available!", e);
         }
     }
 
@@ -80,20 +81,28 @@ public class ReadConfigurationState extends AbstractZooKeeperState {
             this.encounteredPlaceholders.put(path, value);
         }
 
+        if (value == null) {
+            return null;
+        }
+
         StringBuilder stringBuilder = new StringBuilder(propertyValue);
         stringBuilder.replace(startIndex, endIndex + PLACEHOLDER_END.length(), value);
         return this.fillPlaceholders(stringBuilder.toString());
     }
 
     private String getPropertyValue(String path) throws KeeperException {
-        Stat stat = new Stat();
-        byte[] data = this.getData(path, stat);
+        try {
+            Stat stat = new Stat();
+            byte[] data = this.getData(path, stat);
 
-        if (hasData(data)) {
-            return asString(data);
-        } else if (stat.getNumChildren() == 0) {
-            // if this node is a leaf, but has no data, we'll interpret this as an empty value
-            return "";
+            if (hasData(data)) {
+                return asString(data);
+            } else if (stat.getNumChildren() == 0) {
+                // if this node is a leaf, but has no data, we'll interpret this as an empty value
+                return "";
+            }
+        } catch (NoNodeException e) {
+            this.logger.error("Could not read property value from node '{}', because the path does not exist.", path, e);
         }
 
         return null;
