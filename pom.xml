@@ -26,7 +26,7 @@
   </parent>
 
   <artifactId>indoqa-zookeeper-config</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
 
   <name>Indoqa ZooKeeper Config</name>
   <description>Reading properties for Spring from Apache ZooKeeper</description>
@@ -35,7 +35,7 @@
     <connection>scm:git:git@github.com:Indoqa/indoqa-zookeeper-config.git</connection>
     <developerConnection>scm:git:git@github.com:Indoqa/indoqa-zookeeper-config.git</developerConnection>
     <url>https://github.com/Indoqa/indoqa-zookeeper-config</url>
-    <tag>indoqa-zookeeper-config-1.0.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
