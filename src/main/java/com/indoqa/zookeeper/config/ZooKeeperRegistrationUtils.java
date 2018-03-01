@@ -24,6 +24,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
 
 import com.indoqa.zookeeper.StateExecutor;
+import com.indoqa.zookeeper.config.states.RegisterInstanceZooKeeperState;
+import com.indoqa.zookeeper.config.utils.ZooKeeperRegistrationException;
 
 public final class ZooKeeperRegistrationUtils {
 
@@ -88,7 +90,7 @@ public final class ZooKeeperRegistrationUtils {
     }
 
     private static void registerService(StateExecutor stateExecutor, String serviceName) {
-        stateExecutor.executeState(new RegisterInstanceState(serviceName));
+        stateExecutor.executeState(new RegisterInstanceZooKeeperState(serviceName));
     }
 
     private static void registerStateExecutor(ConfigurableApplicationContext applicationContext, StateExecutor stateExecutor) {

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.indoqa.zookeeper.config;
+package com.indoqa.zookeeper.config.states;
 
 import java.util.List;
 
@@ -30,8 +30,10 @@ public class DeleteServiceDescriptionsState extends AbstractZooKeeperState {
 
     @Override
     protected void onStart() throws KeeperException {
-        this.ensureNodeExists("/");
+        super.onStart();
         this.terminate();
+
+        this.ensureNodeExists("/");
 
         List<String> children = this.getChildren("/");
         for (String eachChild : children) {

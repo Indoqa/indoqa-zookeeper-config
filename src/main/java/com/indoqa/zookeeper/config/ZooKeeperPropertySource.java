@@ -22,6 +22,7 @@ import org.springframework.core.env.MapPropertySource;
 
 import com.indoqa.zookeeper.Execution;
 import com.indoqa.zookeeper.StateExecutor;
+import com.indoqa.zookeeper.config.states.ReadConfigurationState;
 
 public class ZooKeeperPropertySource extends MapPropertySource {
 

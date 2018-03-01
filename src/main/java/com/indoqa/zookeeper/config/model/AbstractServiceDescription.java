@@ -14,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.indoqa.zookeeper.config;
+package com.indoqa.zookeeper.config.model;
 
-import java.util.Map;
+import java.util.*;
 
 public class AbstractServiceDescription {
 
     private String id;
     private String name;
     private String description;
-    private Map<String, String> properties;
+    private Map<String, String> properties = new HashMap<>();
+    private List<ServiceInstance> instances = new ArrayList<>();
 
     public final String getDescription() {
         return this.description;
@@ -33,12 +34,20 @@ public class AbstractServiceDescription {
         return this.id;
     }
 
-    public String getName() {
+    public final List<ServiceInstance> getInstances() {
+        return this.instances;
+    }
+
+    public final String getName() {
         return this.name;
     }
 
     public final Map<String, String> getProperties() {
         return this.properties;
+    }
+
+    public final Optional<String> getProperty(String propertyName) {
+        return Optional.ofNullable(this.properties.get(propertyName));
     }
 
     public final void setDescription(String description) {
@@ -49,7 +58,11 @@ public class AbstractServiceDescription {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public final void setInstances(List<ServiceInstance> instances) {
+        this.instances = instances;
+    }
+
+    public final void setName(String name) {
         this.name = name;
     }
 

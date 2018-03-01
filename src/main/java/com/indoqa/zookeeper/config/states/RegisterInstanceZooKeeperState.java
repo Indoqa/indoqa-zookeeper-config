@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.indoqa.zookeeper.config;
+package com.indoqa.zookeeper.config.states;
 
 import java.net.InetAddress;
 import java.util.UUID;
@@ -24,37 +24,39 @@ import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.NodeExistsException;
 
 import com.indoqa.zookeeper.AbstractZooKeeperState;
+import com.indoqa.zookeeper.config.utils.ZooKeeperRegistrationException;
 
-public class RegisterInstanceState extends AbstractZooKeeperState {
+public class RegisterInstanceZooKeeperState extends AbstractZooKeeperState {
 
-    private String serviceId;
+    private final String serviceId;
 
-    public RegisterInstanceState(String serviceId) {
+    public RegisterInstanceZooKeeperState(String serviceId) {
         super("Register Instance for '" + serviceId + "'.");
         this.serviceId = serviceId;
     }
 
     @Override
     protected void onStart() throws KeeperException {
+        super.onStart();
+
         String hostName = this.getHostName();
         String sessionName = "0x" + Long.toHexString(this.zooKeeper.getSessionId());
         this.logger.info("Registering instance '{}' @ session '{}' ...", hostName, sessionName);
 
         String instancesPath = combinePath(this.serviceId, "instances");
         if (!this.exists(instancesPath)) {
-            throw new ZooKeeperRegistrationException(
-                "The path '" + instancesPath + "' does not exist. Check if ZooKeeper contains the service description '"
-                    + this.serviceId + "'.");
+            throw new ZooKeeperRegistrationException("The path '" + instancesPath
+                + "' does not exist. Check if ZooKeeper contains the service description '" + this.serviceId + "'.");
         }
 
         String instancePath = combinePath(instancesPath, hostName);
         this.ensureNodeExists(instancePath);
 
-        String alivePath = combinePath(instancePath, sessionName);
         try {
-            this.createNode(alivePath, new byte[0], CreateMode.EPHEMERAL);
+            String sessionNode = combinePath(instancePath, sessionName);
+            this.createNode(sessionNode, new byte[0], CreateMode.EPHEMERAL);
         } catch (NodeExistsException e) {
-            this.logger.debug("Alive-Node already exists.", e);
+            this.logger.debug("Session node already exists.", e);
             // this can happen if we restarted without losing the session -> nothing to do
         }
     }
@@ -65,15 +67,6 @@ public class RegisterInstanceState extends AbstractZooKeeperState {
         } catch (Exception e) {
             this.logger.error("Could not determine host name.", e);
             return "UNKNOWN-" + UUID.randomUUID().toString();
-        }
-    }
-
-    public static class ZooKeeperRegistrationException extends RuntimeException {
-
-        private static final long serialVersionUID = 1L;
-
-        public ZooKeeperRegistrationException(String message) {
-            super(message);
         }
     }
 }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.indoqa.zookeeper.config;
+package com.indoqa.zookeeper.config.states;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -58,8 +58,6 @@ public class ReadConfigurationState extends AbstractZooKeeperState {
     @Override
     protected void onStart() throws KeeperException {
         super.onStart();
-
-        // the execution should stop after we're done
         this.terminate();
 
         Map<String, Object> properties = this.readProperties();
