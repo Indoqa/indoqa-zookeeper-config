@@ -98,6 +98,7 @@ public abstract class AbstractReadServiceDescriptonZooKeeperState<T extends Abst
     }
 
     private Object readObject(String path, Type type) throws KeeperException {
+        this.logger.debug("ReadObject {} {}", path, type.getTypeName());
         Object result = ReflectionHelper.createInstance(type);
 
         Class<?> currentClass = result.getClass();
