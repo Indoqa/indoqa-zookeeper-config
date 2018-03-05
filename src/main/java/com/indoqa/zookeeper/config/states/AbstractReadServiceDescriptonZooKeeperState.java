@@ -16,7 +16,11 @@
  */
 package com.indoqa.zookeeper.config.states;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import com.indoqa.zookeeper.AbstractZooKeeperState;
+import com.indoqa.zookeeper.config.model.AbstractServiceDescription;
+import com.indoqa.zookeeper.config.utils.ReflectionHelper;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.NoNodeException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -25,12 +29,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.KeeperException.NoNodeException;
-
-import com.indoqa.zookeeper.AbstractZooKeeperState;
-import com.indoqa.zookeeper.config.model.AbstractServiceDescription;
-import com.indoqa.zookeeper.config.utils.ReflectionHelper;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public abstract class AbstractReadServiceDescriptonZooKeeperState<T extends AbstractServiceDescription>
         extends AbstractZooKeeperState {
@@ -62,6 +61,10 @@ public abstract class AbstractReadServiceDescriptonZooKeeperState<T extends Abst
 
         if (ReflectionHelper.isCollection(type)) {
             return this.readCollection(path, type);
+        }
+
+        if (ReflectionHelper.isArray(type)) {
+            return null;
         }
 
         return this.readObject(path, type);

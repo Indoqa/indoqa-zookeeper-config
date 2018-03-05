@@ -32,6 +32,8 @@ public class ServiceDescription extends AbstractServiceDescription {
 
     private Date lastAccess;
 
+    private boolean[] folds;
+
     public Set<String> getDependencies() {
         return this.dependencies;
     }

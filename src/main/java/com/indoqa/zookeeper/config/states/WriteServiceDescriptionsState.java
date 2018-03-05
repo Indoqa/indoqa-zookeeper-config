@@ -19,6 +19,7 @@ package com.indoqa.zookeeper.config.states;
 import static com.indoqa.zookeeper.config.utils.ReflectionHelper.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -79,6 +80,10 @@ public class WriteServiceDescriptionsState<T extends AbstractServiceDescription>
 
         if (Collection.class.isInstance(object)) {
             this.writeCollectionValue(path, (Collection<?>) object, type);
+            return;
+        }
+
+        if (isArray(type)) {
             return;
         }
 
