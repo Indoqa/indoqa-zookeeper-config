@@ -84,10 +84,23 @@ public class WriteServiceDescriptionsState<T extends AbstractServiceDescription>
         }
 
         if (isArray(type)) {
+            this.writeArray(path, object, type);
             return;
         }
 
         this.writeObject(path, object);
+    }
+
+    private void writeArray(String path, Object value, Type type) throws KeeperException {
+        Type valueType = ((Class<?>) type).getComponentType();
+
+        int length = Array.getLength(value);
+        for (int i = 0; i < length; i++) {
+            Object eachValue = Array.get(value, i);
+
+            String valuePath = combinePath(path, String.valueOf(i));
+            this.write(valuePath, eachValue, valueType);
+        }
     }
 
     private void writeCollectionValue(String path, Collection<?> value, Type type) throws KeeperException {

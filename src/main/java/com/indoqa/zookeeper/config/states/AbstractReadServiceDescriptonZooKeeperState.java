@@ -16,12 +16,9 @@
  */
 package com.indoqa.zookeeper.config.states;
 
-import com.indoqa.zookeeper.AbstractZooKeeperState;
-import com.indoqa.zookeeper.config.model.AbstractServiceDescription;
-import com.indoqa.zookeeper.config.utils.ReflectionHelper;
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.KeeperException.NoNodeException;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -29,7 +26,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.NoNodeException;
+
+import com.indoqa.zookeeper.AbstractZooKeeperState;
+import com.indoqa.zookeeper.config.model.AbstractServiceDescription;
+import com.indoqa.zookeeper.config.utils.ReflectionHelper;
 
 public abstract class AbstractReadServiceDescriptonZooKeeperState<T extends AbstractServiceDescription>
         extends AbstractZooKeeperState {
@@ -64,10 +66,26 @@ public abstract class AbstractReadServiceDescriptonZooKeeperState<T extends Abst
         }
 
         if (ReflectionHelper.isArray(type)) {
-            return null;
+            return this.readArray(path, type);
         }
 
         return this.readObject(path, type);
+    }
+
+    private Object readArray(String path, Type type) throws KeeperException {
+        Class<?> valueType = ((Class<?>) type).getComponentType();
+
+        List<String> children = this.getChildren(path);
+        Object result = Array.newInstance(valueType, children.size());
+
+        int index = 0;
+        for (String eachChild : children) {
+            Object childValue = this.read(combinePath(path, eachChild), valueType);
+            Array.set(result, index, childValue);
+            index++;
+        }
+
+        return result;
     }
 
     @SuppressWarnings("unchecked")

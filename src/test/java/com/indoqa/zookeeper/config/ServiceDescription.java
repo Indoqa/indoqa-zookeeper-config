@@ -33,9 +33,14 @@ public class ServiceDescription extends AbstractServiceDescription {
     private Date lastAccess;
 
     private boolean[] folds;
+    private Setting[] settings;
 
     public Set<String> getDependencies() {
         return this.dependencies;
+    }
+
+    public boolean[] getFolds() {
+        return this.folds;
     }
 
     public Date getLastAccess() {
@@ -44,6 +49,10 @@ public class ServiceDescription extends AbstractServiceDescription {
 
     public Map<String, String> getLinks() {
         return this.links;
+    }
+
+    public Setting[] getSettings() {
+        return this.settings;
     }
 
     public int getTotalCount() {
@@ -62,12 +71,20 @@ public class ServiceDescription extends AbstractServiceDescription {
         this.dependencies = dependencies;
     }
 
+    public void setFolds(boolean[] folds) {
+        this.folds = folds;
+    }
+
     public void setLastAccess(Date lastAccess) {
         this.lastAccess = lastAccess;
     }
 
     public void setLinks(Map<String, String> links) {
         this.links = links;
+    }
+
+    public void setSettings(Setting[] settings) {
+        this.settings = settings;
     }
 
     public void setTotalCount(int totalCount) {
@@ -80,5 +97,37 @@ public class ServiceDescription extends AbstractServiceDescription {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public static class Setting {
+
+        private String name;
+
+        private int value;
+
+        public static Setting create(String name, int value) {
+            Setting result = new Setting();
+
+            result.setName(name);
+            result.setValue(value);
+
+            return result;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public int getValue() {
+            return this.value;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setValue(int value) {
+            this.value = value;
+        }
     }
 }

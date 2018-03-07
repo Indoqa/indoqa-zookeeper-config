@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.indoqa.zookeeper.AbstractZooKeeperState;
 import com.indoqa.zookeeper.Execution;
 import com.indoqa.zookeeper.StateExecutor;
+import com.indoqa.zookeeper.config.ServiceDescription.Setting;
 import com.indoqa.zookeeper.config.model.ServiceInstance;
 import com.indoqa.zookeeper.config.states.ReadServiceDescriptionState;
 import com.indoqa.zookeeper.config.states.WriteServiceDescriptionsState;
@@ -81,7 +82,7 @@ public class ServiceDescriptionStateTest {
         ServiceDescription serviceDescription = this.createServiceDescription();
 
         try (StateExecutor stateExecutor = new StateExecutor(testingCluster.getConnectString(), CONNECT_TIMEOUT)) {
-            Execution execution = stateExecutor.executeState(new WriteServiceDescriptionsState(Arrays.asList(serviceDescription)));
+            Execution execution = stateExecutor.executeState(new WriteServiceDescriptionsState<>(Arrays.asList(serviceDescription)));
             stateExecutor.waitForTermination(execution);
 
             execution = stateExecutor
@@ -99,7 +100,7 @@ public class ServiceDescriptionStateTest {
         ServiceDescription serviceDescription = this.createServiceDescription();
 
         try (StateExecutor stateExecutor = new StateExecutor(testingCluster.getConnectString(), CONNECT_TIMEOUT)) {
-            Execution execution = stateExecutor.executeState(new WriteServiceDescriptionsState(Arrays.asList(serviceDescription)));
+            Execution execution = stateExecutor.executeState(new WriteServiceDescriptionsState<>(Arrays.asList(serviceDescription)));
             stateExecutor.waitForTermination(execution);
 
             execution = stateExecutor.executeState(new ReadServiceDescriptionState<>("unknown-id", ServiceDescription.class));
@@ -120,6 +121,8 @@ public class ServiceDescriptionStateTest {
         serviceDescription.setTotalCount(12);
         serviceDescription.setType("type");
         serviceDescription.setUrl("url");
+        serviceDescription.setFolds(new boolean[] {true, true, false, true});
+        serviceDescription.setSettings(new Setting[] {Setting.create("setting-a", 3), Setting.create("setting-b", -4)});
 
         Set<String> dependencies = new HashSet<>();
         dependencies.add("dependency-1");
