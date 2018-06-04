@@ -16,7 +16,10 @@
  */
 package com.indoqa.zookeeper.config.states;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.net.InetAddress;
+import java.time.Instant;
 import java.util.UUID;
 
 import org.apache.zookeeper.CreateMode;
@@ -24,6 +27,7 @@ import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.NodeExistsException;
 
 import com.indoqa.zookeeper.AbstractZooKeeperState;
+import com.indoqa.zookeeper.config.utils.ReflectionHelper;
 import com.indoqa.zookeeper.config.utils.ZooKeeperRegistrationException;
 
 public class RegisterInstanceZooKeeperState extends AbstractZooKeeperState {
@@ -49,12 +53,13 @@ public class RegisterInstanceZooKeeperState extends AbstractZooKeeperState {
                 + "' does not exist. Check if ZooKeeper contains the service description '" + this.serviceId + "'.");
         }
 
-        String instancePath = combinePath(instancesPath, hostName);
+        String instancePath = combinePath(instancesPath, hostName, "sessions");
         this.ensureNodeExists(instancePath);
 
         try {
             String sessionNode = combinePath(instancePath, sessionName);
-            this.createNode(sessionNode, new byte[0], CreateMode.EPHEMERAL);
+            byte[] value = ReflectionHelper.getSerializedValue(Instant.now()).getBytes(UTF_8);
+            this.createNode(sessionNode, value, CreateMode.EPHEMERAL);
         } catch (NodeExistsException e) {
             this.logger.debug("Session node already exists.", e);
             // this can happen if we restarted without losing the session -> nothing to do

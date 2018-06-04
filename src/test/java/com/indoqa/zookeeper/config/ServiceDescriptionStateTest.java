@@ -34,6 +34,7 @@ import com.indoqa.zookeeper.AbstractZooKeeperState;
 import com.indoqa.zookeeper.Execution;
 import com.indoqa.zookeeper.StateExecutor;
 import com.indoqa.zookeeper.config.ServiceDescription.Setting;
+import com.indoqa.zookeeper.config.model.AbstractServiceDescription;
 import com.indoqa.zookeeper.config.model.ServiceInstance;
 import com.indoqa.zookeeper.config.states.ReadServiceDescriptionState;
 import com.indoqa.zookeeper.config.states.WriteServiceDescriptionsState;
@@ -89,7 +90,7 @@ public class ServiceDescriptionStateTest {
                 .executeState(new ReadServiceDescriptionState<>(serviceDescription.getId(), ServiceDescription.class));
             stateExecutor.waitForTermination(execution);
 
-            ServiceDescription readServiceDescription = ReadServiceDescriptionState.getServiceDescription(execution);
+            AbstractServiceDescription readServiceDescription = ReadServiceDescriptionState.getServiceDescription(execution);
 
             Assertions.assertThat(serviceDescription).isEqualToComparingFieldByFieldRecursively(readServiceDescription);
         }
@@ -134,12 +135,10 @@ public class ServiceDescriptionStateTest {
         links.put("link-2", "url-2");
         serviceDescription.setLinks(links);
 
-        List<ServiceInstance> instances = new ArrayList<>();
         ServiceInstance instance = new ServiceInstance();
         instance.setName("instance-1");
         instance.setSession("session-1", Instant.now());
-        instances.add(instance);
-        serviceDescription.setInstances(instances);
+        serviceDescription.addInstance(instance);
 
         Map<String, String> properties = new HashMap<>();
         properties.put("property-1", "value-1");

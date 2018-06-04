@@ -49,7 +49,9 @@ public abstract class AbstractReadServiceDescriptonZooKeeperState<T extends Abst
             return null;
         }
 
-        return (T) this.read(path, resultType);
+        T result = (T) this.read(path, resultType);
+        result.onRead();
+        return result;
     }
 
     private Object read(String path, Type type) throws KeeperException {

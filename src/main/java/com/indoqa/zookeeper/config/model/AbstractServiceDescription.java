@@ -16,15 +16,22 @@
  */
 package com.indoqa.zookeeper.config.model;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 
-public class AbstractServiceDescription {
+public abstract class AbstractServiceDescription {
 
     private String id;
     private String name;
     private String description;
     private Map<String, String> properties = new HashMap<>();
-    private List<ServiceInstance> instances = new ArrayList<>();
+    private Map<String, ServiceInstance> instances = new HashMap<>();
+
+    public void addInstance(ServiceInstance instance) {
+        this.instances.put(instance.getName(), instance);
+    }
 
     public final String getDescription() {
         return this.description;
@@ -34,7 +41,7 @@ public class AbstractServiceDescription {
         return this.id;
     }
 
-    public final List<ServiceInstance> getInstances() {
+    public Map<String, ServiceInstance> getInstances() {
         return this.instances;
     }
 
@@ -50,6 +57,12 @@ public class AbstractServiceDescription {
         return Optional.ofNullable(this.properties.get(propertyName));
     }
 
+    public void onRead() {
+        for (Entry<String, ServiceInstance> eachEntry : this.instances.entrySet()) {
+            eachEntry.getValue().setName(eachEntry.getKey());
+        }
+    }
+
     public final void setDescription(String description) {
         this.description = description;
     }
@@ -58,7 +71,7 @@ public class AbstractServiceDescription {
         this.id = id;
     }
 
-    public final void setInstances(List<ServiceInstance> instances) {
+    public void setInstances(Map<String, ServiceInstance> instances) {
         this.instances = instances;
     }
 
