@@ -50,11 +50,19 @@ public abstract class AbstractReadServiceDescriptonZooKeeperState<T extends Abst
         }
 
         T result = (T) this.read(path, resultType);
+        if (result.getId() == null) {
+            return null;
+        }
+
         result.onRead();
         return result;
     }
 
     private Object read(String path, Type type) throws KeeperException {
+        if (!this.exists(path)) {
+            return null;
+        }
+
         if (ReflectionHelper.isSimpleType(type)) {
             return this.readSimpleValue(path, type);
         }

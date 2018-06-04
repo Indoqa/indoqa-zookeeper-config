@@ -41,7 +41,7 @@ public abstract class AbstractServiceDescription {
         return this.id;
     }
 
-    public Map<String, ServiceInstance> getInstances() {
+    public final Map<String, ServiceInstance> getInstances() {
         return this.instances;
     }
 
@@ -58,6 +58,10 @@ public abstract class AbstractServiceDescription {
     }
 
     public void onRead() {
+        if (this.instances == null) {
+            return;
+        }
+
         for (Entry<String, ServiceInstance> eachEntry : this.instances.entrySet()) {
             eachEntry.getValue().setName(eachEntry.getKey());
         }
@@ -71,7 +75,7 @@ public abstract class AbstractServiceDescription {
         this.id = id;
     }
 
-    public void setInstances(Map<String, ServiceInstance> instances) {
+    public final void setInstances(Map<String, ServiceInstance> instances) {
         this.instances = instances;
     }
 
