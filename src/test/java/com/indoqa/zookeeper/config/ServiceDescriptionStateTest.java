@@ -92,7 +92,7 @@ public class ServiceDescriptionStateTest {
 
             AbstractServiceDescription readServiceDescription = ReadServiceDescriptionState.getServiceDescription(execution);
 
-            Assertions.assertThat(serviceDescription).isEqualToComparingFieldByFieldRecursively(readServiceDescription);
+            Assertions.assertThat(serviceDescription).usingRecursiveComparison().isEqualTo(readServiceDescription);
         }
     }
 
