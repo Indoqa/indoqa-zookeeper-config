@@ -15,7 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <packaging>jar</packaging>
 
@@ -33,7 +35,8 @@
 
   <scm>
     <connection>scm:git:git@github.com:Indoqa/indoqa-zookeeper-config.git</connection>
-    <developerConnection>scm:git:git@github.com:Indoqa/indoqa-zookeeper-config.git</developerConnection>
+    <developerConnection>
+      scm:git:git@github.com:Indoqa/indoqa-zookeeper-config.git</developerConnection>
     <url>https://github.com/Indoqa/indoqa-zookeeper-config</url>
     <tag>HEAD</tag>
   </scm>
@@ -119,4 +122,19 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>test-coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.12</version>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
