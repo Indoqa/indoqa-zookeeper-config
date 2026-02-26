@@ -100,7 +100,7 @@ public final class ReflectionHelper {
             }
 
             try {
-                return classType.newInstance();
+                return classType.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new RuntimeException("Failed to instantiate type " + type, e);
             }

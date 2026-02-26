@@ -23,10 +23,10 @@ import java.util.*;
 import org.apache.curator.test.TestingCluster;
 import org.apache.zookeeper.KeeperException;
 import org.assertj.core.api.Assertions;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,23 +39,23 @@ import com.indoqa.zookeeper.config.model.ServiceInstance;
 import com.indoqa.zookeeper.config.states.ReadServiceDescriptionState;
 import com.indoqa.zookeeper.config.states.WriteServiceDescriptionsState;
 
-public class ServiceDescriptionStateTest {
+class ServiceDescriptionStateTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceDescriptionStateTest.class);
     private static final int CONNECT_TIMEOUT = 30000;
 
     private static TestingCluster testingCluster;
 
-    @AfterClass
-    public static void afterClass() throws IOException {
+    @AfterAll
+    static void afterClass() throws IOException {
         LOGGER.info("Stopping test cluster");
         testingCluster.stop();
         wait(1000);
         testingCluster.close();
     }
 
-    @BeforeClass
-    public static void beforeClass() throws Exception {
+    @BeforeAll
+    static void beforeClass() throws Exception {
         LOGGER.info("Starting test cluster");
         testingCluster = new TestingCluster(3);
         testingCluster.start();
@@ -70,8 +70,8 @@ public class ServiceDescriptionStateTest {
         }
     }
 
-    @Before
-    public void before() {
+    @BeforeEach
+    void before() {
         try (StateExecutor stateExecutor = new StateExecutor(testingCluster.getConnectString(), CONNECT_TIMEOUT)) {
             Execution execution = stateExecutor.executeState(new DeleteAllZooKeeperState());
             stateExecutor.waitForTermination(execution);
@@ -79,7 +79,7 @@ public class ServiceDescriptionStateTest {
     }
 
     @Test
-    public void test() {
+    void test() {
         ServiceDescription serviceDescription = this.createServiceDescription();
 
         try (StateExecutor stateExecutor = new StateExecutor(testingCluster.getConnectString(), CONNECT_TIMEOUT)) {
@@ -97,7 +97,7 @@ public class ServiceDescriptionStateTest {
     }
 
     @Test
-    public void testWrongId() {
+    void testWrongId() {
         ServiceDescription serviceDescription = this.createServiceDescription();
 
         try (StateExecutor stateExecutor = new StateExecutor(testingCluster.getConnectString(), CONNECT_TIMEOUT)) {
